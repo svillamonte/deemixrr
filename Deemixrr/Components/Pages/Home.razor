@@ -1,0 +1,19 @@
+﻿@page "/"
+@inject HtmxCounter.HtmxCounterState CounterState
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div class="mb-4">
+  <HtmxCounter State="@CounterState" />
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        CounterState.Value = 0;
+    }
+}
