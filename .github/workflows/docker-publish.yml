@@ -1,0 +1,41 @@
+name: Publish Package
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container
+        run: |
+          # Lowercase the repository name for Docker image compatibility
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          
+          dotnet publish /t:PublishContainer \
+            -c Release \
+            -p:ContainerRegistry=ghcr.io \
+            -p:ContainerRepository=$REPO_NAME \
+            -p:ContainerImageTag=latest \
+            -p:ContainerImageTag=${{ github.sha }}
